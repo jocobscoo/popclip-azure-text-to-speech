@@ -2,6 +2,7 @@
 # #popclip
 # name: Azure TTS
 # icon: symbol:message.and.waveform
+# stdin: text
 # options:
 # - { identifier: region, label: Azure Region, type: string, default value: eastus, description: "Region for Speech Service" }
 # - { identifier: key, label: Azure Subscription Key, type: string, description: "The key of Speech Resource" }
@@ -12,6 +13,9 @@
 # Create a temporary audio file
 temp_audio_file=$(mktemp)
 
+# get input from stdin
+input=$(cat); log input
+
 # Use curl to download and save the audio data to the temporary file
 curl -X POST "https://${POPCLIP_OPTION_REGION}.tts.speech.microsoft.com/cognitiveservices/v1" \
      -H "Ocp-Apim-Subscription-Key: ${POPCLIP_OPTION_KEY}" \
@@ -19,7 +23,7 @@ curl -X POST "https://${POPCLIP_OPTION_REGION}.tts.speech.microsoft.com/cognitiv
      -H "X-Microsoft-OutputFormat: ${POPCLIP_OPTION_FORMAT}" \
      -d "<speak version=\"1.0\" xmlns=\"http://www.w3.org/2001/10/synthesis\" xml:lang=\"${POPCLIP_OPTION_LANG}\">
     <voice name=\"${POPCLIP_OPTION_VOICE}\">
-        $POPCLIP_TEXT
+        ${input}
     </voice>
 </speak>" -so "$temp_audio_file"
 
